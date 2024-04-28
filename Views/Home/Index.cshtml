@@ -1,0 +1,73 @@
+﻿@model HomeViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container">
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-8">
+            @if (User.Identity.IsAuthenticated)
+            {
+                @if(User.IsInRole("Administrator"))
+                {
+                    <div class="mb-4">
+                        <h1>Administrator Information</h1>
+                        <h4>Bars: @Model.BarsCount</h4>
+                        <h4>Reviews: @Model.ReviewsCount</h4>
+                        <h4>Users: @Model.UsersCount</h4>
+                    </div>
+                }
+
+                <form id="searchForm" method="get" asp-action="Search">
+                    <div class="input-group">
+                        <input type="hidden" name="searchButton" value="true" />
+                        <input type="text" name="query" class="form-control" placeholder="Search..." />
+                        <div class="input-group-append">
+                            <button type="submit" id="searchBtn" class="btn btn-primary">Search</button>
+                        </div>
+                    </div>
+                </form>
+
+                // Checking if the search button is clicked
+                var searchButtonClicked = ViewBag.SearchButtonClicked as bool? ?? false;
+
+                <div id="searchResults" class="mt-4">
+                    @if (searchButtonClicked)
+                    {
+                        <h2>Search Results for "@Model.Query"</h2>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3>Bars</h3>
+                                <div class="row">
+                                    @foreach (var bar in Model.Bars)
+                                    {
+                                        <div class="col-md-3">
+                                            <div class="card mb-4">
+                                                @if (!string.IsNullOrEmpty(bar.ImageLocation))
+                                                {
+                                                    <img src="@bar.ImageLocation" class="card-img-top img-fluid" alt="Bar Image">
+                                                }
+                                                <div class="card-body">
+                                                    <h5 class="card-title">@bar.Name</h5>
+                                                    <h6 class="card-text">@bar.Description</h6>
+                                                    @Html.ActionLink("Review Now", "Review", new { barId = @bar.Id }, new { @class = "btn btn-primary" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <h1>Bar Rating</h1>
+                <h3>Register or Login to start reviewing bars!</h3>
+            }
+        </div>
+    </div>
+</div>
